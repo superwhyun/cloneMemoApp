@@ -10,6 +10,10 @@ import UIKit
 
 class MemoComposeViewController: UIViewController {
 
+    var editTarget:Memo?
+    
+    
+
     
     @IBAction func close(_ sender: Any) {
         
@@ -30,16 +34,33 @@ class MemoComposeViewController: UIViewController {
             
         }
         
-        let newMemo = Memo(content: memo)
-        Memo.dummyMemoList.append(newMemo)
+//        let newMemo = Memo(content: memo)
+//        Memo.dummyMemoList.append(newMemo)
+        if let target = editTarget {
+            target.content = memo
+            DataManager.shared.saveContext() // Update의 기능을 걍 얘가 하네? 키값 같은것 없나? 뭘보고 이러나?
+            NotificationCenter.default.post(name: MemoComposeViewController.orgMemoDidUpdated, object: nil)
+            
+        } else {
+            DataManager.shared.addNewMemo(memo)
+            NotificationCenter.default.post(name: MemoComposeViewController.newMemoDidInserted, object: nil)
+        }
         
-        NotificationCenter.default.post(name: MemoComposeViewController.newMemoDidInserted, object: nil)
+        
         dismiss(animated: true, completion: nil)
     }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let memo = editTarget {
+            navigationItem.title = "왜? 쫄려? 고치시게?"
+            memoTextView.text = memo.content
+        } else {
+            navigationItem.title = "또 지껄여 보지?"
+            memoTextView.text = ""
+        }
 
         // Do any additional setup after loading the view.
     }
@@ -60,4 +81,7 @@ class MemoComposeViewController: UIViewController {
 
 extension MemoComposeViewController {
     static let newMemoDidInserted = Notification.Name(rawValue: "newMemoDidInserted")
+    static let orgMemoDidUpdated = Notification.Name(rawValue: "orgMemoDidUpdated")
+
 }
+

@@ -25,6 +25,8 @@ class MemoListTableViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        DataManager.shared.fetchMemo()
         tableView.reloadData() // ios13부터는 이 코드 필오없다.
         // 로그를 찍어준다. #function 하게 되면 함수이름을 찍어준다.
         print(#function)
@@ -56,7 +58,7 @@ class MemoListTableViewController: UITableViewController {
             
             // segue.destination은 ViewController 타입이므로 우리가 원하는 클래스로 타입캐스팅 해 주어야 한다.
             if let vc = segue.destination as? DetailViewController {
-                vc.memo = Memo.dummyMemoList[indexPath.row]
+                vc.memo = DataManager.shared.memoList[indexPath.row]
                 
             }
         }
@@ -90,16 +92,16 @@ class MemoListTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return Memo.dummyMemoList.count
+        return DataManager.shared.memoList.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
 
-        let target = Memo.dummyMemoList[indexPath.row]
+        let target = DataManager.shared.memoList[indexPath.row]
         cell.textLabel?.text = target.content
-        cell.detailTextLabel?.text = formatter.string(from: target.insertDate)
+        cell.detailTextLabel?.text = formatter.string(for: target.insertDate)
 
         return cell
     }
